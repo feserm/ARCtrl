@@ -28,7 +28,7 @@ def fulfill_write_contract (basePath : str, contract : Contract) :
         if contract.DTO == None :
             ensure_directory(p)
             Path.write_text(p, "")
-        elif contract.DTOType.name == "ISA_Assay" or contract.DTOType.name == "ISA_Study" or contract.DTOType.name == "ISA_Investigation" :
+        elif contract.DTOType.name in ["ISA_Assay", "ISA_Study", "ISA_Investigation"] :
             ensure_directory(p)
             Xlsx.to_xlsx_file(p, contract.DTO.fields[0])
         elif contract.DTOType == "PlainText" :
@@ -43,14 +43,14 @@ def fulfill_write_contract (basePath : str, contract : Contract) :
 def fulfill_read_contract (basePath : str, contract : Contract) :
     if contract.Operation == "READ" :
         normalizedPath = os.path.normpath(Path(basePath).joinpath(contract.Path))
-        if contract.DTOType.name == "ISA_Assay" or contract.DTOType.name == "ISA_Study" or contract.DTOType.name == "ISA_Investigation" :        
+        if contract.DTOType.name in ["ISA_Assay", "ISA_Study", "ISA_Investigation"] :        
             fswb = Xlsx.from_xlsx_file(normalizedPath)
             contract.DTO = DTO(0, fswb)
         elif contract.DTOType == "PlainText" :
             content = Path.read_text(normalizedPath)
             contract.DTO = DTO(1, content)
         else :
-            print("Handling of ${contract.DTOType} in a READ contract is not yet implemented")
+            print(f"Handling of {contract.DTOType} in a READ contract is not yet implemented")
 
     else :
-        print("Error (fulfillReadContract): ${contract} is not a READ contract")
+        print(f"Error (fulfillReadContract): {contract} is not a READ contract")
